@@ -20,7 +20,7 @@ np.random.seed(seed_val)
 torch.manual_seed(seed_val)
 torch.cuda.manual_seed_all(seed_val)
 
-num_epochs = 2
+num_epochs = 5
 batch_size = 32
 embedding_dim = 768
 num_output_classes = 2
@@ -31,9 +31,11 @@ print('Using device {}'.format(device))
 
 train_df, test_df = load_and_preprocess_df()
 
+train_df['label'].value_counts()
+
 tokenizer, model = load_model(model_type)
 
-train_dataloader = get_dataloader(train_df, batch_size, tokenizer)
+train_dataloader = get_dataloader(train_df, batch_size, tokenizer, device)
 
 loss_function = nn.CrossEntropyLoss()
 optimizer = AdamW(model.parameters(), lr = 2e-5, eps = 1e-8)
@@ -46,6 +48,6 @@ model.cuda()
 model = train(train_dataloader, num_epochs, model, loss_function, optimizer, scheduler, embedding_dim, num_output_classes, device)
 
 test_batch_size = 1
-test_dataloader = get_dataloader(test_df, test_batch_size, tokenizer)
+test_dataloader = get_dataloader(test_df, test_batch_size, tokenizer, device)
 
 predictions_df = test(test_dataloader, model, embedding_dim, num_output_classes, device)

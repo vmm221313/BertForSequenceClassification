@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
 
-def get_dataloader(df, batch_size, tokenizer):
+def get_dataloader(df, batch_size, tokenizer, device):
     sentences = df['text'].tolist()
     labels = df['label'].tolist()
     
@@ -27,6 +27,10 @@ def get_dataloader(df, batch_size, tokenizer):
     inputs = torch.tensor(input_ids)
     masks = torch.tensor(attention_masks)
     labels = torch.tensor(labels)
+    
+    inputs = inputs.to(device)
+    masks = masks.to(device)
+    labels = labels.to(device)
 
     data = TensorDataset(inputs, masks, labels)
     dataloader = DataLoader(data, batch_size = batch_size)

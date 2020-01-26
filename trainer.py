@@ -37,10 +37,21 @@ def train(train_dataloader, num_epochs, model, loss_function, optimizer, schedul
 
             model.zero_grad()        
             
-            outputs = model(b_input_ids, token_type_ids=None, attention_mask=b_input_mask)
-            predictions = nn.Linear(embedding_dim, num_output_classes)(outputs[1]) 
-            targets = b_labels
+            outputs = model(input_ids = b_input_ids, attention_mask = b_input_mask)
+            #outputs = (outputs[0].to(device), outputs[1].to(device))
+            predictions = outputs[0] ##
+            predictions = predictions.to(device) ##
 
+            #dropout = nn.Dropout(p = 0.2).to(device)
+
+            #reg_out = dropout(outputs[1])
+
+            #linear = nn.Linear(embedding_dim, num_output_classes).to(device)
+            #predictions = linear(reg_out)    
+
+            targets = b_labels
+            targets = targets.to(device)
+            predictions = predictions.to(device)
             loss = loss_function(predictions, targets)
                             
             total_loss += loss.item()
@@ -57,7 +68,7 @@ def train(train_dataloader, num_epochs, model, loss_function, optimizer, schedul
         print("Training epoch took: {:}".format(format_time(time.time() - t0)))
         print("")
         
-        save_bert_model(model, len(train_dataloader), i+1)
+    save_bert_model(model, len(train_dataloader), i+1)
     
     print("")
     print("Training complete!")
